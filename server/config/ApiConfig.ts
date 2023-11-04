@@ -13,6 +13,6 @@ const API_CONFIG = {
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   },
 };
-const isDevelopment = API_CONFIG.NODE_ENV === Stages.Development;
+export const isDevelopment = API_CONFIG.NODE_ENV === Stages.Development;
 
 export default API_CONFIG;

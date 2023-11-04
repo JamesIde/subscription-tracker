@@ -1,12 +1,22 @@
-import express, { Express, Request, Response } from "express";
-import config from "./config/config";
+import express from "express";
+import API_CONFIG from "./config/ApiConfig";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 const app = express();
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Express + TypeScript Server");
+app.get("/api/v1/heartbeat", (req, res) => {
+  res.json({
+    ok: true,
+  });
 });
 
-app.listen(config.port, () => {
-  console.log(`🚀 Up and away on port ${config.port}`);
+app.use(helmet());
+app.use(rateLimit(API_CONFIG.RATE_LIMITER));
+app.use(express.json());
+
+app.listen(API_CONFIG.PORT, () => {
+  console.log(
+    `🚀 Listening on ${API_CONFIG.PORT} and environment is ${API_CONFIG.PORT}`
+  );
 });

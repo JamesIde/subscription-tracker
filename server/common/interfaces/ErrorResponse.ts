@@ -1,4 +1,4 @@
 export default interface ErrorResponse {
-  message: string;
+  messages: Array<string>;
   stack?: string;
 }

@@ -1,9 +1,10 @@
-import { Button, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import auth from "@react-native-firebase/auth";
 
 import EditScreenInfo from "../../components/EditScreenInfo";
 import { Text, View } from "../../components/Themed";
+import { Button } from "react-native-paper";
 
 export default function TabOneScreen() {
   GoogleSignin.configure({
@@ -30,15 +31,17 @@ export default function TabOneScreen() {
 
   return (
     <View>
-      <Text>Here</Text>
+      <Text className="text-nord-0">Here</Text>
       <Button
-        title="Google Sign-In"
         onPress={() =>
           onGoogleButtonPress().then(() =>
             console.log("Signed in with Google!")
           )
         }
-      />
+        mode="contained"
+      >
+        Hello{" "}
+      </Button>
     </View>
   );
 }

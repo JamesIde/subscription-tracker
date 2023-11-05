@@ -1,9 +1,7 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import auth from "@react-native-firebase/auth";
-
-import EditScreenInfo from "../../components/EditScreenInfo";
-import { Text, View } from "../../components/Themed";
+import { Link } from "expo-router";
 import { Button } from "react-native-paper";
 
 export default function TabOneScreen() {
@@ -46,19 +44,4 @@ export default function TabOneScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: "80%",
-  },
-});
+const styles = StyleSheet.create({});

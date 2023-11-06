@@ -3,6 +3,7 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import auth from "@react-native-firebase/auth";
 import { Link } from "expo-router";
 import { Button } from "react-native-paper";
+import { LoginManager, AccessToken } from "react-native-fbsdk-next";
 
 export default function TabOneScreen() {
   GoogleSignin.configure({
@@ -22,8 +23,39 @@ export default function TabOneScreen() {
     // Sign-in the user with the credential
     auth()
       .signInWithCredential(googleCredential)
+      .then(async (user) => {
+        console.log(JSON.stringify(user));
+      });
+  }
+
+  async function onFacebookButtonPress() {
+    // Attempt login with permissions
+    const result = await LoginManager.logInWithPermissions([
+      "public_profile",
+      "email",
+    ]);
+    console.log(result);
+    if (result.isCancelled) {
+      throw "User cancelled the login process";
+    }
+
+    // Once signed in, get the users AccessToken
+    const data = await AccessToken.getCurrentAccessToken();
+
+    if (!data) {
+      throw "Something went wrong obtaining access token";
+    }
+
+    // Create a Firebase credential with the AccessToken
+    const facebookCredential = auth.FacebookAuthProvider.credential(
+      data.accessToken
+    );
+
+    // Sign-in the user with the credential
+    auth()
+      .signInWithCredential(facebookCredential)
       .then((user) => {
-        console.log(user);
+        console.log(JSON.stringify(user));
       });
   }
 
@@ -38,7 +70,16 @@ export default function TabOneScreen() {
         }
         mode="contained"
       >
-        Hello{" "}
+        Google{" "}
+      </Button>
+      <Button
+        onPress={() =>
+          onFacebookButtonPress().then(() =>
+            console.log("Signed in with Facebook!")
+          )
+        }
+      >
+        Facebook{" "}
       </Button>
     </View>
   );

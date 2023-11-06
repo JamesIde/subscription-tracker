@@ -23,7 +23,7 @@ export default function TabOneScreen() {
     // Sign-in the user with the credential
     auth()
       .signInWithCredential(googleCredential)
-      .then((user) => {
+      .then(async (user) => {
         console.log(JSON.stringify(user));
       });
   }

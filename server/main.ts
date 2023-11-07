@@ -7,7 +7,7 @@ import { HttpStatus } from "./common/enum/status";
 import { errorHandler } from "./middlewares/errorHandler";
 import { validateRequest } from "./middlewares/requestValidator";
 import { TestSchema } from "./common/schemas/test";
-
+import authRouter from "./modules/authentication/authentication.router";
 const app = express();
 
 app.use(helmet());
@@ -25,6 +25,7 @@ app.post(
     });
   }
 );
+app.use("/api/v1/auth", authRouter);
 
 app.use(errorHandler);
 app.listen(API_CONFIG.PORT, () => {

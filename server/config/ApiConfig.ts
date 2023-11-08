@@ -5,7 +5,7 @@ dotenv.config();
 
 export const isDevelopment = process.env.NODE_ENV === Stages.Development;
 
-const API_CONFIG = {
+const ApiConfig = {
   PORT: process.env.PORT || 5000,
   NODE_ENV: process.env.NODE_ENV || Stages.Development,
   RATE_LIMITER: {
@@ -21,4 +21,4 @@ const API_CONFIG = {
   },
 };
 
-export default API_CONFIG;
+export default ApiConfig;

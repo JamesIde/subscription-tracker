@@ -1,14 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import { RegistrationSchema } from "../../common/schemas/registration";
 import { ServerConstants } from "../../common/constants/server.constants";
-import { UserDto } from "../../common/interfaces/UserDTO";
 
 const prisma = new PrismaClient();
 
-export async function checkUserByProviderId(id: string) {
+export async function checkUserByProviderId(providerUid: string) {
   const user = await prisma.user.findFirst({
     where: {
-      providerId: id,
+      providerUid: providerUid,
     },
   });
   return user ? true : false;
@@ -32,7 +31,7 @@ export async function createUser(user: RegistrationSchema) {
       lastName: user.lastName,
       provider: user.provider,
       photoURL: user.photoURL ?? ServerConstants.REGISTRATION.DEFAULT_PHOTO_URL,
-      providerId: user.providerId,
+      providerUid: user.providerUid,
     },
   });
   return newUser;
@@ -45,7 +44,7 @@ export async function getUserByEmailAndProviderId(
   const user = await prisma.user.findFirst({
     where: {
       emailAddress: email,
-      providerId: providerId,
+      providerUid: providerId,
     },
   });
   return user;
@@ -62,7 +61,7 @@ export async function getUserByEmailOnly(email: string) {
       lastName: true,
       photoURL: true,
       provider: true,
-      providerId: true,
+      providerUid: true,
       emailAddress: true,
       emailVerified: true,
     },

@@ -18,16 +18,16 @@ export async function registration(
   next: NextFunction
 ) {
   try {
-    if (req.body.providerId) {
+    if (req.body.providerUid) {
       // This is a social user registration.UI will handle the logic to call correct path (reg/log)
       // as Firebase only has a 'SignIn' event, not 'Register' for social users
       const existsByProviderId =
         await authenticationRepository.checkUserByProviderId(
-          req.body.providerId
+          req.body.providerUid
         );
       if (existsByProviderId) {
         console.warn(`
-         Error - User with providerId ${req.body.providerId} already exists.
+         Error - User with providerId ${req.body.providerUid} already exists.
         `);
         throw new AppError(
           "An error occured registering the user.",
@@ -71,3 +71,11 @@ export async function registration(
     next(error);
   }
 }
+
+/**
+ *
+ * social login
+ * send providerId (fb/g),
+ * email
+ * providerId
+ */

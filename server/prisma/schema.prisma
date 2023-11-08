@@ -11,7 +11,7 @@ datasource db {
 }
 
 model User {
-  id            String  @id @default(uuid())
+  id            String   @id @default(uuid())
   firstName     String
   lastName      String
   providerId    String?
@@ -19,4 +19,6 @@ model User {
   photoURL      String
   emailAddress  String
   emailVerified Boolean
+  updatedAt     DateTime @updatedAt
+  createdAt     DateTime @default(now())
 }

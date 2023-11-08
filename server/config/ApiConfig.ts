@@ -15,6 +15,10 @@ const API_CONFIG = {
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   },
   DATABASE_URL: isDevelopment ? "" : "", // Can't use this inside prisma schema TODO investigate
+  JWT: {
+    SECRET: process.env.JWT_SECRET,
+    EXPIRES_IN: process.env.JWT_EXPIRES_IN,
+  },
 };
 
 export default API_CONFIG;

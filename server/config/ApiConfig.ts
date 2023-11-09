@@ -1,9 +1,11 @@
 import dotenv from "dotenv";
-import { Stages } from "../enum/stages";
+import { Stages } from "../common/enum/stages";
 
 dotenv.config();
 
-const API_CONFIG = {
+export const isDevelopment = process.env.NODE_ENV === Stages.Development;
+
+const ApiConfig = {
   PORT: process.env.PORT || 5000,
   NODE_ENV: process.env.NODE_ENV || Stages.Development,
   RATE_LIMITER: {
@@ -12,7 +14,11 @@ const API_CONFIG = {
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   },
+  DATABASE_URL: isDevelopment ? "" : "", // Can't use this inside prisma schema TODO investigate
+  JWT: {
+    SECRET: process.env.JWT_SECRET,
+    EXPIRES_IN: process.env.JWT_EXPIRES_IN,
+  },
 };
-export const isDevelopment = API_CONFIG.NODE_ENV === Stages.Development;
 
-export default API_CONFIG;
+export default ApiConfig;

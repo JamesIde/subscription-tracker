@@ -1,17 +1,15 @@
 import express from "express";
-import API_CONFIG from "./config/ApiConfig";
+import ApiConfig from "./config/ApiConfig";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import { AppError } from "./common/interfaces/AppError";
-import { HttpStatus } from "./common/enum/status";
 import { errorHandler } from "./middlewares/errorHandler";
 import { validateRequest } from "./middlewares/requestValidator";
 import { TestSchema } from "./common/schemas/test";
-
+import authRouter from "./modules/authentication/authentication.router";
 const app = express();
 
 app.use(helmet());
-app.use(rateLimit(API_CONFIG.RATE_LIMITER));
+app.use(rateLimit(ApiConfig.RATE_LIMITER));
 app.use(express.json());
 
 app.post(
@@ -25,10 +23,11 @@ app.post(
     });
   }
 );
+app.use("/api/v1/auth", authRouter);
 
 app.use(errorHandler);
-app.listen(API_CONFIG.PORT, () => {
+app.listen(ApiConfig.PORT, () => {
   console.log(
-    `🚀 Listening on ${API_CONFIG.PORT} and environment is ${API_CONFIG.PORT}`
+    `🚀 Listening on ${ApiConfig.PORT} and environment is ${ApiConfig.PORT}`
   );
 });

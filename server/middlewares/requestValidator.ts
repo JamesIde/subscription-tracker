@@ -1,6 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import { ZodError } from "zod";
-import { HttpStatus } from "../common/enum/status";
 import { RequestValidators } from "../common/schemas/requestValidators";
 
 export function validateRequest(validators: RequestValidators) {

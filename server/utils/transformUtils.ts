@@ -1,4 +1,4 @@
-import { UserDto } from "../common/interfaces/UserDTO";
+import { UserDto } from "../common/interfaces/UserDto";
 
 export class TransformUtils {
   static transformUser(user: UserDto, token: string) {

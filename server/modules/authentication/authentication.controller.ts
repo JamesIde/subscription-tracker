@@ -5,7 +5,8 @@ import { AppError } from "../../common/interfaces/AppError";
 import { HttpStatus } from "../../common/enum/status";
 import { TokenUtils } from "../../utils/tokenUtils";
 import { TransformUtils } from "../../utils/transformUtils";
-import { UserDto } from "../../common/interfaces/UserDTO";
+import { UserDto } from "../../common/interfaces/UserDto";
+import { LoginSchema } from "../../common/schemas/login";
 
 /**
  * Better practice would be to extract all this to a service,
@@ -75,7 +76,24 @@ export async function registration(
 /**
  *
  * social login
- * send providerId (fb/g),
+ * send provider (fb/g),
  * email
  * providerId
+ * #####
+ * normal login
+ * send provider (em/pwd)
+ * email
+ *
+ * we make decision based on providerId in payload to do social login flow
  */
+
+export async function login(
+  req: Request<{}, {}, LoginSchema>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+  } catch (error) {
+    next(error);
+  }
+}

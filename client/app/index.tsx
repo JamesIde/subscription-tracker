@@ -4,7 +4,7 @@ import SocialLogin from "./components/shared/SocialLogin";
 import { Providers } from "../core/enum/provider.login";
 import { useEffect } from "react";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { AppConstants } from "../config/config";
+import { AppConstants } from "../core/config/config";
 export default function Home() {
   return (
     <View>

@@ -1,4 +1,4 @@
-export interface User {
+export interface UserAuthenticateSuccess {
   id: string;
   firstName: string;
   lastName: string;
@@ -13,3 +13,5 @@ export interface User {
     providerId: string;
   };
 }
+
+export interface User extends Omit<UserAuthenticateSuccess, "token"> {}

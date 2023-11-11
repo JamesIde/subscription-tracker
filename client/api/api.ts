@@ -1,4 +1,4 @@
-import { AppConstants } from "../config/config";
+import { AppConstants } from "../core/config/config";
 import axios from "axios";
 
 export const axiosClient = axios.create({

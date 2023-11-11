@@ -1,7 +1,11 @@
 import { FirebaseAuthTypes } from "@react-native-firebase/auth";
-import { SocialRegistration } from "../core/interfaces/registration";
-import { Providers } from "../core/enum/provider.login";
-import { SocialLogin } from "../core/interfaces/login";
+import { SocialRegistration } from "../interfaces/registration";
+import { Providers } from "../enum/provider.login";
+import { SocialLogin } from "../interfaces/login";
+import {
+  User,
+  UserAuthenticateSuccess,
+} from "../interfaces/authenticate.success";
 
 export class TransformUtils {
   static mapSocialUserRegister(
@@ -18,13 +22,24 @@ export class TransformUtils {
     };
   }
 
-  static mapSocialuserLogin(
+  static mapSocialUserLogin(
     user: FirebaseAuthTypes.UserCredential
   ): SocialLogin {
     return {
       email: user.user.email || "",
       provider: user.additionalUserInfo?.providerId as Providers,
       providerUid: user.user.uid,
+    };
+  }
+
+  static mapUserAuthenticateWithoutToken(user: UserAuthenticateSuccess): User {
+    return {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      photoUrl: user.photoUrl,
+      contactInformation: user.contactInformation,
+      providerInformation: user.providerInformation,
     };
   }
 }

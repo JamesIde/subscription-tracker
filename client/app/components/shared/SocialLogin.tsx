@@ -6,14 +6,14 @@ import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
 import { Providers } from "../../../core/enum/provider.login";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { LoginManager, AccessToken } from "react-native-fbsdk-next";
-import { AppConstants } from "../../../config/config";
+import { AppConstants } from "../../../core/config/config";
 import { StyleSheet } from "react-native";
 import { ErrorAlert } from "../error/error";
 import { useRouter } from "expo-router";
 import { Text, View } from "react-native";
-import { TransformUtils } from "../../../utils/TransformUtils";
+import { TransformUtils } from "../../../core/utils/TransformUtils";
 
-import { User } from "../../../core/interfaces/authenticate.success";
+import { UserAuthenticateSuccess } from "../../../core/interfaces/authenticate.success";
 import { SecureStoreKey } from "../../../core/enum/secure.store";
 import { AxiosError } from "axios";
 
@@ -87,8 +87,11 @@ export default function SocialLogin({ isLogin }: { isLogin: boolean }) {
     if (isLogin) {
       // login api
       try {
-        const login = TransformUtils.mapSocialuserLogin(user);
-        const res = await axiosClient.post<User>(ApiEndpoints.LOGIN, login);
+        const login = TransformUtils.mapSocialUserLogin(user);
+        const res = await axiosClient.post<UserAuthenticateSuccess>(
+          ApiEndpoints.LOGIN,
+          login
+        );
         await handleLoginOrRegisterSuccess(res.data);
       } catch (error) {
         if (error instanceof AxiosError) {
@@ -98,7 +101,7 @@ export default function SocialLogin({ isLogin }: { isLogin: boolean }) {
     } else {
       try {
         const reg = TransformUtils.mapSocialUserRegister(user);
-        const res = await axiosClient.post<User>(
+        const res = await axiosClient.post<UserAuthenticateSuccess>(
           ApiEndpoints.REGISTRATION,
           reg
         );
@@ -120,12 +123,17 @@ export default function SocialLogin({ isLogin }: { isLogin: boolean }) {
       : "Already have an account? Login";
   };
 
-  const handleLoginOrRegisterSuccess = async (user: User) => {
-    await SecureStore.setItemAsync(SecureStoreKey.TOKEN, user.token).then(
-      () => {
-        router.replace("/(tabs)/one");
-      }
-    );
+  const handleLoginOrRegisterSuccess = async (
+    userSuccess: UserAuthenticateSuccess
+  ) => {
+    await SecureStore.setItemAsync(
+      SecureStoreKey.TOKEN,
+      userSuccess.token
+    ).then(() => {
+      router.replace("/(tabs)/one");
+    });
+
+    const user = TransformUtils.mapUserAuthenticateWithoutToken(userSuccess);
   };
 
   return (

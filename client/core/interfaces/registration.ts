@@ -1,14 +1,6 @@
-// firstName: z.string(),
-//   lastName: z.string(),
-//   providerUid: z.string().optional(),
-//   provider: z.nativeEnum(Providers),
-//   photoURL: z.string().optional(),
-//   email: z.string(),
-//   emailVerified: z.boolean(),
-
 import { Providers } from "../enum/provider.login";
 
-export interface Registration {
+export interface SocialRegistration {
   firstName: string;
   lastName: string;
   providerUid?: string;

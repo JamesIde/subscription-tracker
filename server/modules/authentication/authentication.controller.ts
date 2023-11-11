@@ -79,14 +79,14 @@ export async function login(
   next: NextFunction
 ) {
   try {
-    const { emailAddress, provider, providerId } = req.body;
+    const { email, provider, providerUid } = req.body;
 
     let user = {} as UserDto;
 
     if (provider === Providers.EMAIL_PASSWORD) {
       const exists =
         await authenticationRepository.checkUserByEmailAndProviderType(
-          emailAddress,
+          email,
           provider
         );
 
@@ -99,11 +99,11 @@ export async function login(
       }
 
       user = (await authenticationRepository.getUserByEmailOnly(
-        emailAddress
+        email
       )) as UserDto;
     } else {
       // Social login - provider Id must be present
-      if (!providerId) {
+      if (!providerUid) {
         throw new AppError(
           "An error occured validating your identity",
           HttpStatus.BAD_REQUEST,
@@ -112,8 +112,8 @@ export async function login(
       }
 
       user = (await authenticationRepository.getUserByEmailAndProviderUid(
-        emailAddress,
-        providerId
+        email,
+        providerUid
       )) as UserDto;
     }
 

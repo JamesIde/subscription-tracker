@@ -57,7 +57,7 @@ export default function SocialLogin({ isLogin }: { isLogin: boolean }) {
 
     try {
       const user = await auth().signInWithCredential(facebookCredential);
-      handleLoginOrRegister(user);
+      await loginOrRegisterUser(user);
     } catch (error) {
       throw ErrorAlert(error);
     }
@@ -77,21 +77,30 @@ export default function SocialLogin({ isLogin }: { isLogin: boolean }) {
     // Sign-in the user with the credential
     try {
       const user = await auth().signInWithCredential(googleCredential);
-      await handleLoginOrRegister(user);
+      await loginOrRegisterUser(user);
     } catch (error) {
       throw ErrorAlert(error);
     }
   }
 
-  async function handleLoginOrRegister(user: FirebaseAuthTypes.UserCredential) {
-    const userObj = TransformUtils.mapSocialUser(user);
+  async function loginOrRegisterUser(user: FirebaseAuthTypes.UserCredential) {
     if (isLogin) {
       // login api
+      try {
+        const login = TransformUtils.mapSocialuserLogin(user);
+        const res = await axiosClient.post<User>(ApiEndpoints.LOGIN, login);
+        await handleLoginOrRegisterSuccess(res.data);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          console.log(`axios err`, error);
+        }
+      }
     } else {
       try {
+        const reg = TransformUtils.mapSocialUserRegister(user);
         const res = await axiosClient.post<User>(
           ApiEndpoints.REGISTRATION,
-          userObj
+          reg
         );
         await handleLoginOrRegisterSuccess(res.data);
       } catch (error) {

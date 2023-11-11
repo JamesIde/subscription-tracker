@@ -1,6 +1,4 @@
-import { Registration } from "../core/interfaces/registration";
 import { AppConstants } from "../config/config";
-import { User } from "../core/interfaces/authenticate.success";
 import axios from "axios";
 
 export const axiosClient = axios.create({

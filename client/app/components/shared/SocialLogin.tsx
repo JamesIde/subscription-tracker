@@ -55,18 +55,6 @@ export default function SocialLogin({ isLogin }: { isLogin: boolean }) {
       data.accessToken
     );
 
-    // SecureStore.setItemAsync("test", "test").then(() =>
-    //   console.log(`saved`)
-    // );
-    // const a = SecureStore.getItemAsync("test").then((res) => {
-    //   console.log(`res: ${res}`);
-    // });
-    // setTimeout(() => {
-    //   SecureStore.deleteItemAsync("test").then(() =>
-    //     console.log(`deleted`)
-    //   );
-    // }, 5000);
-
     try {
       const user = await auth().signInWithCredential(facebookCredential);
       handleLoginOrRegister(user);
@@ -96,11 +84,10 @@ export default function SocialLogin({ isLogin }: { isLogin: boolean }) {
   }
 
   async function handleLoginOrRegister(user: FirebaseAuthTypes.UserCredential) {
+    const userObj = TransformUtils.mapSocialUser(user);
     if (isLogin) {
       // login api
     } else {
-      const userObj = TransformUtils.mapSocialUser(user);
-
       try {
         const res = await axiosClient.post<User>(
           ApiEndpoints.REGISTRATION,

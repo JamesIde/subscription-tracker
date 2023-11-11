@@ -1,7 +1,8 @@
 import { UserDto } from "../common/interfaces/UserDto";
+import { UserResponse } from "../common/interfaces/UserResponse";
 
 export class TransformUtils {
-  static transformUser(user: UserDto, token: string) {
+  static transformUser(user: UserDto, token: string): UserResponse {
     return {
       id: user.id,
       firstName: user.firstName,
@@ -14,7 +15,7 @@ export class TransformUtils {
       },
       providerInformation: {
         provider: user.provider,
-        providerId: user.providerId,
+        providerUid: user.providerUid,
       },
     };
   }

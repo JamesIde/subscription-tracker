@@ -27,9 +27,9 @@ export async function registration(
           req.body.providerUid
         );
       if (existsByProviderId) {
-        console.warn(`
-         Error - User with providerId ${req.body.providerUid} already exists.
-        `);
+        console.log(
+          `Error - User with providerId ${req.body.providerUid} already exists.`
+        );
         throw new AppError(
           "An error occured registering the user.",
           HttpStatus.BAD_REQUEST,

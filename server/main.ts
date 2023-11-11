@@ -5,13 +5,18 @@ import rateLimit from "express-rate-limit";
 import { errorHandler } from "./middlewares/errorHandler";
 import { validateRequest } from "./middlewares/requestValidator";
 import { TestSchema } from "./common/schemas/test";
+import cors from "cors";
 import authRouter from "./modules/authentication/authentication.router";
 const app = express();
 
 app.use(helmet());
 app.use(rateLimit(ApiConfig.RATE_LIMITER));
 app.use(express.json());
-
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 app.post(
   "/api/v1/heartbeat",
   validateRequest({

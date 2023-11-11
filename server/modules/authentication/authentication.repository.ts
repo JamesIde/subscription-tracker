@@ -4,7 +4,7 @@ import { ServerConstants } from "../../common/constants/server.constants";
 
 const prisma = new PrismaClient();
 
-export async function checkUserByProviderId(providerUid: string) {
+export async function checkUserByProviderUid(providerUid: string) {
   const user = await prisma.user.findFirst({
     where: {
       providerUid: providerUid,
@@ -37,17 +37,30 @@ export async function createUser(user: RegistrationSchema) {
   return newUser;
 }
 
-export async function getUserByEmailAndProviderId(
+export async function getUserByEmailAndProviderUid(
   email: string,
-  providerId: string
+  providerUid: string
 ) {
   const user = await prisma.user.findFirst({
     where: {
       emailAddress: email,
-      providerUid: providerId,
+      providerUid: providerUid,
     },
   });
   return user;
+}
+
+export async function checkUserByEmailAndProviderType(
+  email: string,
+  provider: string
+) {
+  const user = await prisma.user.findFirst({
+    where: {
+      emailAddress: email,
+      provider: provider,
+    },
+  });
+  return user ? true : false;
 }
 
 export async function getUserByEmailOnly(email: string) {

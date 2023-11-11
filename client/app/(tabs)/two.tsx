@@ -1,12 +1,8 @@
-import { StyleSheet, View, Text } from "react-native";
-
-export default function TabTwoScreen() {
+import { View, Text } from "react-native";
+export default function TabTwo() {
   return (
     <View>
-      <Text>Tab Two</Text>
-      <View />
+      <Text>two</Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({});

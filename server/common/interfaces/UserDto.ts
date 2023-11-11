@@ -9,5 +9,5 @@ export interface UserDto {
   emailVerified: boolean;
   photoURL: string;
   provider: string;
-  providerId?: string | null;
+  providerUid?: string | null;
 }

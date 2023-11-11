@@ -1,6 +1,5 @@
 import { ExpoConfig, ConfigContext } from "@expo/config";
 import * as dotenv from "dotenv";
-import { CONFIG } from "./config/config";
 dotenv.config();
 
 export default ({ config }: ConfigContext) => ({
@@ -42,10 +41,10 @@ export default ({ config }: ConfigContext) => ({
       [
         "react-native-fbsdk-next",
         {
-          appID: process.env.FACEBOOK_APP_ID,
-          clientToken: process.env.FACEBOOK_CLIENT_TOKEN,
-          displayName: process.env.FACEBOOK_DISPLAY_NAME,
-          scheme: process.env.FACEBOOK_SCHEME,
+          appID: process.env.FACEBOOK_APP_ID!,
+          clientToken: process.env.FACEBOOK_CLIENT_TOKEN!,
+          displayName: process.env.FACEBOOK_DISPLAY_NAME!,
+          scheme: process.env.FACEBOOK_SCHEME!,
         },
       ],
     ],

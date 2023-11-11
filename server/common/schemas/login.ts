@@ -6,3 +6,5 @@ export const LoginSchema = z.object({
   emailAddress: z.string(),
   providerId: z.string().optional(),
 });
+
+export type LoginSchema = z.infer<typeof LoginSchema>;

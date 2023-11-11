@@ -17,9 +17,9 @@ export function errorHandler(
   console.log("########################################");
 
   if (err instanceof AppError) {
-    console.error("Error - ", err.message);
+    console.log("Error - ", err.message);
     if (err.payload) {
-      console.error(JSON.stringify(err.payload, null, 2));
+      console.log(JSON.stringify(err.payload));
     }
     statusCode = err.statusCode;
     messages.push(err.message);

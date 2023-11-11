@@ -1,0 +1,150 @@
+import FacebookButton from "./FacebookButton";
+import GoogleButton from "./GoogleButton";
+import OrDivider from "./OrDivider";
+
+import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
+import { Providers } from "../../../core/enum/provider.login";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { LoginManager, AccessToken } from "react-native-fbsdk-next";
+import { AppConstants } from "../../../config/config";
+import { StyleSheet } from "react-native";
+import { ErrorAlert } from "../error/error";
+import { useRouter } from "expo-router";
+import { Text, View } from "react-native";
+import { TransformUtils } from "../../../utils/TransformUtils";
+
+import { User } from "../../../core/interfaces/authenticate.success";
+import { SecureStoreKey } from "../../../core/enum/secure.store";
+import { AxiosError } from "axios";
+
+import * as SecureStore from "expo-secure-store";
+import { axiosClient, ApiEndpoints } from "../../../api/api";
+import useToken from "../../hooks/useToken";
+
+export default function SocialLogin({ isLogin }: { isLogin: boolean }) {
+  const router = useRouter();
+  const label = isLogin ? "Login" : "Register";
+
+  function handleSocial(provider: Providers) {
+    switch (provider) {
+      case Providers.FACEBOOK:
+        continueWithFacebook();
+        break;
+      case Providers.GOOGLE:
+        continueWithGoogle();
+        break;
+    }
+  }
+
+  async function continueWithFacebook() {
+    // Attempt login with permissions
+    const result = await LoginManager.logInWithPermissions(
+      AppConstants.SOCIAL_LOGIN.FACEBOOK.SCOPES
+    );
+    if (result.isCancelled) {
+      // TODO: handle cancel
+    }
+
+    const data = await AccessToken.getCurrentAccessToken();
+
+    if (!data) {
+      throw ErrorAlert("Could not get access token");
+    }
+
+    const facebookCredential = auth.FacebookAuthProvider.credential(
+      data.accessToken
+    );
+
+    try {
+      const user = await auth().signInWithCredential(facebookCredential);
+      handleLoginOrRegister(user);
+    } catch (error) {
+      throw ErrorAlert(error);
+    }
+  }
+
+  async function continueWithGoogle() {
+    GoogleSignin.configure({
+      webClientId:
+        "833857504592-pf8qc56ofaflj2509hv804l4v0ciru4k.apps.googleusercontent.com",
+    });
+    await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+    const { idToken } = await GoogleSignin.signIn();
+
+    // Create a Google credential with the token
+    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+
+    // Sign-in the user with the credential
+    try {
+      const user = await auth().signInWithCredential(googleCredential);
+      await handleLoginOrRegister(user);
+    } catch (error) {
+      throw ErrorAlert(error);
+    }
+  }
+
+  async function handleLoginOrRegister(user: FirebaseAuthTypes.UserCredential) {
+    const userObj = TransformUtils.mapSocialUser(user);
+    if (isLogin) {
+      // login api
+    } else {
+      try {
+        const res = await axiosClient.post<User>(
+          ApiEndpoints.REGISTRATION,
+          userObj
+        );
+        await handleLoginOrRegisterSuccess(res.data);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          console.log(`axios err`, error);
+        }
+        auth()
+          .currentUser?.delete()
+          .then(() => console.log(`current user deleted`));
+      }
+    }
+  }
+
+  const showRegisterOrLoginAlt = () => {
+    return isLogin
+      ? "Don't have an account? Register"
+      : "Already have an account? Login";
+  };
+
+  const handleLoginOrRegisterSuccess = async (user: User) => {
+    await SecureStore.setItemAsync(SecureStoreKey.TOKEN, user.token).then(
+      () => {
+        router.replace("/(tabs)/one");
+      }
+    );
+  };
+
+  return (
+    <>
+      <View>
+        <View>
+          <Text
+            style={styles.showLoginOrRegister}
+            onPress={() => {
+              isLogin ? router.replace("/register") : router.replace("/");
+            }}
+          >
+            {showRegisterOrLoginAlt()}
+          </Text>
+        </View>
+      </View>
+      <OrDivider />
+      <FacebookButton label={label} onFacebookClick={handleSocial} />
+      <GoogleButton label={label} onGoogleClick={handleSocial} />
+    </>
+  );
+}
+
+const styles = StyleSheet.create({
+  showLoginOrRegister: {
+    fontWeight: "bold",
+    fontSize: 15,
+    textAlign: "center",
+    color: "#4261A5",
+  },
+});

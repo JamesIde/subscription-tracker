@@ -1,5 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { RegistrationSchema } from "../../common/schemas/registration";
+import {
+  IdpSchema,
+  RegistrationSchema,
+} from "../../common/schemas/registration";
 import * as authenticationRepository from "./authentication.repository";
 import { AppError } from "../../common/interfaces/AppError";
 import { HttpStatus } from "../../common/enum/status";
@@ -20,25 +23,6 @@ export async function registration(
   next: NextFunction
 ) {
   try {
-    if (req.body.providerUid) {
-      // This is a social user registration.UI will handle the logic to call correct path (reg/log)
-      // as Firebase only has a 'SignIn' event, not 'Register' for social users
-      const existsByProviderUid =
-        await authenticationRepository.checkUserByProviderUid(
-          req.body.providerUid
-        );
-      if (existsByProviderUid) {
-        console.log(
-          `Error - User with providerId ${req.body.providerUid} already exists.`
-        );
-        throw new AppError(
-          "An error occured registering the user.",
-          HttpStatus.BAD_REQUEST,
-          req.body
-        );
-      }
-    }
-
     const existsByEmail =
       await authenticationRepository.checkUserByEmailAddress(req.body.email);
     if (existsByEmail) {
@@ -64,6 +48,7 @@ export async function registration(
         req.body
       );
     }
+
     const token = TokenUtils.generateToken(newUser.id, newUser.provider);
 
     res
@@ -79,48 +64,95 @@ export async function login(
   next: NextFunction
 ) {
   try {
-    const { email, provider, providerUid } = req.body;
-
+    const { email, provider } = req.body;
     let user = {} as UserDto;
 
-    if (provider === Providers.EMAIL_PASSWORD) {
-      const exists =
-        await authenticationRepository.checkUserByEmailAndProviderType(
-          email,
-          provider
-        );
-
-      if (!exists) {
-        throw new AppError(
-          "An error occured validating your identity",
-          HttpStatus.NOT_FOUND,
-          req.body
-        );
-      }
-
-      user = (await authenticationRepository.getUserByEmailOnly(
-        email
-      )) as UserDto;
-    } else {
-      // Social login - provider Id must be present
-      if (!providerUid) {
-        throw new AppError(
-          "An error occured validating your identity",
-          HttpStatus.BAD_REQUEST,
-          req.body
-        );
-      }
-
-      user = (await authenticationRepository.getUserByEmailAndProviderUid(
+    const exists =
+      await authenticationRepository.checkUserByEmailAndProviderType(
         email,
-        providerUid
-      )) as UserDto;
+        provider
+      );
+
+    if (!exists) {
+      throw new AppError(
+        "An error occured validating your identity",
+        HttpStatus.NOT_FOUND,
+        req.body
+      );
     }
+
+    user = (await authenticationRepository.getUserByEmailOnly(
+      email
+    )) as UserDto;
 
     const token = TokenUtils.generateToken(user.id, user.provider);
     return res
       .status(HttpStatus.OK)
       .json(TransformUtils.transformUser(user, token));
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function idpUser(
+  req: Request<{}, {}, IdpSchema>,
+  res: Response,
+  next: NextFunction
+) {
+  const { providerUid, email } = req.body;
+  try {
+    let token = "";
+    const idpUserExists =
+      await authenticationRepository.getUserByEmailAndProviderUid(
+        email,
+        providerUid
+      );
+
+    if (idpUserExists) {
+      // This is a social login and we have the user object
+      token = TokenUtils.generateToken(
+        idpUserExists.id,
+        idpUserExists.provider
+      );
+
+      res
+        .status(HttpStatus.OK)
+        .json(TransformUtils.transformUser(idpUserExists, token));
+    } else {
+      // This is a social registration
+      const existsByEmail =
+        await authenticationRepository.checkUserByEmailAddress(email);
+
+      if (existsByEmail) {
+        console.warn(`
+           Error - User with email ${email} already exists.
+          `);
+        throw new AppError(
+          "An error occured registering the user.",
+          HttpStatus.BAD_REQUEST,
+          req.body
+        );
+      } else {
+        const newUser = await authenticationRepository.createUser(req.body);
+
+        if (!newUser) {
+          console.warn(`
+             Error - User with email ${email} could not be created.
+            `);
+          throw new AppError(
+            "An error occured registering the user.",
+            HttpStatus.BAD_REQUEST,
+            req.body
+          );
+        }
+
+        token = TokenUtils.generateToken(newUser.id, newUser.provider);
+
+        res
+          .status(HttpStatus.CREATED)
+          .json(TransformUtils.transformUser(newUser, token));
+      }
+    }
   } catch (error) {
     next(error);
   }
